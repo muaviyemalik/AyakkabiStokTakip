@@ -49,7 +49,7 @@ class Program
                     break;
             }
 
-            Console.WriteLine("Devam etmek için bir tuşa basın...");
+            Console.WriteLine("\nDevam etmek için bir tuşa basın...");
             Console.ReadKey();
         }
     }
@@ -92,18 +92,12 @@ class Program
 
         // Numara Girişi (TryParse Kontrolü)
         Console.Write("Numara: ");
-        string girilen = Console.ReadLine();
         int numara;
-        bool basariliMi = int.TryParse(girilen, out numara);
-
-        if (basariliMi)
+        while (!int.TryParse(Console.ReadLine(), out numara) || numara <= 0)
         {
-            yeniAyakkabi.Numara = numara;
+            Console.Write("Lütfen geçerli bir numara girin: ");
         }
-        else
-        {
-            Console.WriteLine("Hatalı giriş! Lütfen sadece sayı giriniz.");
-        }
+        yeniAyakkabi.Numara = numara;
 
         // Renk Girişi (Boş geçilemez kontrolü)
         Console.Write("Renk: ");
@@ -152,7 +146,11 @@ class Program
         string ad = Console.ReadLine().ToLower();
         
         Console.Write("Numarasını girin: ");
-        int numara = int.Parse(Console.ReadLine());
+        int numara;
+        while (!int.TryParse(Console.ReadLine(), out numara))
+        {
+            Console.Write("Geçerli bir numara girin: ");
+        }
 
         // Ayakkabıyı bul
         var ayakkabi = envanter.FirstOrDefault(x => x.Ad.Equals(ad, StringComparison.OrdinalIgnoreCase) && x.Numara == numara);
@@ -167,8 +165,12 @@ class Program
             Console.WriteLine($"\nBulunan Ayakkabı: {ayakkabi.Ad}, Numara: {ayakkabi.Numara}");
             Console.WriteLine($"Mevcut Stok: {ayakkabi.StokAdedi} | Fiyat: {ayakkabi.Fiyat} TL");
 
-            Console.Write("\nEklenecek (+) veya Silinecek (-) miktar girin (Örn: 5 veya -2): ");
-            int miktar = int.Parse(Console.ReadLine());
+            Console.Write("\nEklenecek (+) veya Silinecek (-) miktar girin: ");
+            int miktar;
+            while (!int.TryParse(Console.ReadLine(), out miktar))
+            {
+                Console.Write("Lütfen sadece sayı girin: ");
+            }
 
             // Stok yeterli mi kontrolü
             if (ayakkabi.StokAdedi + miktar < 0)
@@ -182,7 +184,12 @@ class Program
                 // Verileri kaydet
                 VerileriKaydet();
                 Console.WriteLine("Stok başarıyla güncellendi.");
-                Console.WriteLine($"Yeni Stok: {ayakkabi.StokAdedi}");
+                if(miktar >= 0)
+                    Console.WriteLine($"{miktar} adet stok eklendi.");
+                else
+                    Console.WriteLine($"{-miktar} adet stok silindi.");
+                Console.WriteLine($"\nGüncellenen Ayakkabı: {ayakkabi.Ad}, Numara: {ayakkabi.Numara}");
+                Console.WriteLine($"Mevcut Stok: {ayakkabi.StokAdedi} | Fiyat: {ayakkabi.Fiyat} TL");
             }
         }
     }
@@ -214,7 +221,7 @@ class Program
     {
         // Türkçe karakterleri bozmadan ve okunaklı kaydetmek için ayar
         var ayarlar = new JsonSerializerOptions { WriteIndented = true };
-        string json = JsonSerializer.Serialize(envanter);
+        string json = JsonSerializer.Serialize(envanter, ayarlar);
         File.WriteAllText(dosyaYolu, json);
     }
 
