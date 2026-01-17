@@ -1,0 +1,6 @@
+# C# için standart gereksiz dosyalar
+bin/
+obj/
+.vs/
+*.user
+*.json
