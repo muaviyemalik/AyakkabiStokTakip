@@ -22,8 +22,9 @@ class Program
             Console.WriteLine("1. İsimle Arama Yap");
             Console.WriteLine("2. Yeni Ayakkabı Ekle");
             Console.WriteLine("3. Stok Ekle/Sil");
-            Console.WriteLine("4. Tüm Listeyi Göster");
-            Console.WriteLine("5. Çıkış");
+            Console.WriteLine("4. Fiyat Güncelle");
+            Console.WriteLine("5. Tüm Listeyi Göster");
+            Console.WriteLine("6. Çıkış");
             Console.Write("Seçiminiz: ");
             
             string secim = Console.ReadLine();
@@ -40,9 +41,12 @@ class Program
                     StokGuncelle();
                     break;
                 case "4":
-                    TumListeyiGoster();
+                    FiyatGuncelle();
                     break;
                 case "5":
+                    TumListeyiGoster();
+                    break;
+                case "6":
                     return;
                 default:
                     Console.WriteLine("Geçersiz seçim, lütfen tekrar deneyin.");
@@ -142,7 +146,7 @@ class Program
     {
         Console.WriteLine("\n--- Stok Güncelleme ---");
         
-        Console.Write("Güncellenecek ayakkabı adını girin: ");
+        Console.Write("Stok miktarı güncellenecek ayakkabı adını girin: ");
         string ad = Console.ReadLine().ToLower();
         
         Console.Write("Numarasını girin: ");
@@ -193,8 +197,52 @@ class Program
             }
         }
     }
+    // --- 4. FİYAT GÜNCELLEME METODU ---
+    static void FiyatGuncelle()
+    {
+        Console.WriteLine("\n--- Fiyat Güncelleme ---");
+        
+        Console.Write("Fiyatı güncellenecek ayakkabı adını girin: ");
+        string ad = Console.ReadLine().ToLower();
+        
+        Console.Write("Numarasını girin: ");
+        int numara;
+        while (!int.TryParse(Console.ReadLine(), out numara))
+        {
+            Console.Write("Geçerli bir numara girin: ");
+        }
 
-    // --- 4. TÜM LİSTEYİ GÖSTERME METODU ---
+        // Ayakkabıyı bul
+        var ayakkabi = envanter.FirstOrDefault(x => x.Ad.Equals(ad, StringComparison.OrdinalIgnoreCase) && x.Numara == numara);
+
+        if (ayakkabi == null)
+        {
+            Console.WriteLine("HATA!! Ayakkabı bulunamadı.");
+            return;
+        }
+        else
+        {
+            Console.WriteLine($"\nBulunan Ayakkabı: {ayakkabi.Ad}, Numara: {ayakkabi.Numara}");
+            Console.WriteLine($"Mevcut Fiyat: {ayakkabi.Fiyat} TL | Stok: {ayakkabi.StokAdedi}");
+
+            Console.Write("\nYeni fiyatı girin: ");
+            decimal yeniFiyat;
+            while (!decimal.TryParse(Console.ReadLine(), out yeniFiyat) || yeniFiyat <= 0)
+            {
+                Console.Write("Lütfen geçerli bir fiyat girin: ");
+            }
+
+            ayakkabi.Fiyat = yeniFiyat;
+            // Verileri kaydet
+            VerileriKaydet();
+            Console.WriteLine("Fiyat başarıyla güncellendi.");
+            Console.WriteLine($"Yeni Fiyat: {ayakkabi.Fiyat} TL");
+            Console.WriteLine($"\nGüncellenen Ayakkabı: {ayakkabi.Ad}, Numara: {ayakkabi.Numara}");
+            Console.WriteLine($"Mevcut Fiyat: {ayakkabi.Fiyat} TL | Stok: {ayakkabi.StokAdedi}");
+        }
+    }
+
+    // --- 5. TÜM LİSTEYİ GÖSTERME METODU ---
     static void TumListeyiGoster()
     {
         Console.WriteLine("\n--- Tüm Ayakkabı Envanteri ---");
