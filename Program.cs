@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.IO;
+using System.Text.Json;
 class Program
 {
     // Veritabanı niyetine kullandığımız liste
     static List<Ayakkabi> envanter = new List<Ayakkabi>();
+    // Verilerin saklanacağı dosya adı
+    static string dosyaYolu = "envanter.json";
 
     static void Main(string[] args)
     {
-        // Başlangıç verileri
-        envanter.Add(new Ayakkabi { Numara = 40, Renk = "Siyah", Ad = "Nike", Fiyat = 100, StokAdedi = 10 });
-        envanter.Add(new Ayakkabi { Numara = 42, Renk = "Beyaz", Ad = "Adidas", Fiyat = 120, StokAdedi = 5 });
-        envanter.Add(new Ayakkabi { Numara = 39, Renk = "Kırmızı", Ad = "Puma", Fiyat = 90, StokAdedi = 8 });
+        // Öncesinde Kayıtlı verileri yükle
+        VerileriYukle();
 
         while (true)
         {
@@ -69,10 +70,12 @@ class Program
         else
         {
             Console.WriteLine("Bulunan Ayakkabılar:");
+            Console.WriteLine($"{"Marka",-20} | {"Renk",-10} | {"Numara",-6} | {"Fiyat",-10} | {"Stok Sayısı",-5}");
+            Console.WriteLine(new string('-', 60));
             foreach (var ayakkabi in bulunanAyakkabilar)
             {
                 // Tablo görünümü için formatlı yazdırma
-                Console.WriteLine($"{ayakkabi.Ad,-20} | {ayakkabi.Numara,-6} | {ayakkabi.Fiyat + " TL",-10} | {ayakkabi.StokAdedi,-5}");
+                Console.WriteLine($"{ayakkabi.Ad,-20} | {ayakkabi.Renk,-10} | {ayakkabi.Numara,-6} | {ayakkabi.Fiyat + " TL",-10} | {ayakkabi.StokAdedi,-5}");
             }
         }
     }
@@ -135,6 +138,8 @@ class Program
 
         // Listeye Ekleme
         envanter.Add(yeniAyakkabi);
+        // Verileri kaydet
+        VerileriKaydet();
         Console.WriteLine("Yeni ayakkabı başarıyla eklendi.");
     }
 
@@ -174,6 +179,8 @@ class Program
             else
             {
                 ayakkabi.StokAdedi += miktar;
+                // Verileri kaydet
+                VerileriKaydet();
                 Console.WriteLine("Stok başarıyla güncellendi.");
                 Console.WriteLine($"Yeni Stok: {ayakkabi.StokAdedi}");
             }
@@ -191,6 +198,24 @@ class Program
         {
             Console.WriteLine($"{ayakkabi.Ad,-20} | {ayakkabi.Numara,-6} | {ayakkabi.Fiyat + " TL",-10} | {ayakkabi.StokAdedi,-5} | {ayakkabi.Renk,-10}");
         }
+    }
+    // --- VERİLERİ YÜKLEME METODU ---
+    static void VerileriYukle()
+    {
+        if(File.Exists(dosyaYolu))
+        {
+            string okunanJson = File.ReadAllText(dosyaYolu);
+            envanter = JsonSerializer.Deserialize<List<Ayakkabi>>(okunanJson);
+        }
+    }
+
+    // --- VERİLERİ KAYDETME METODU ---
+    static void VerileriKaydet()
+    {
+        // Türkçe karakterleri bozmadan ve okunaklı kaydetmek için ayar
+        var ayarlar = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(envanter);
+        File.WriteAllText(dosyaYolu, json);
     }
 
     // --- AYAKKABI SINIFI (CLASS) ---
