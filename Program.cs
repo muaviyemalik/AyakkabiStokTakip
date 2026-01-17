@@ -211,8 +211,18 @@ class Program
     {
         if(File.Exists(dosyaYolu))
         {
-            string okunanJson = File.ReadAllText(dosyaYolu);
-            envanter = JsonSerializer.Deserialize<List<Ayakkabi>>(okunanJson);
+            try
+            {
+                string okunanJson = File.ReadAllText(dosyaYolu);
+                if(!string.IsNullOrWhiteSpace(okunanJson))
+                {
+                    envanter = JsonSerializer.Deserialize<List<Ayakkabi>>(okunanJson);
+                }
+            }
+            catch
+            {
+                envanter = new List<Ayakkabi>();
+            }
         }
     }
 
